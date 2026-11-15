@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="ckb" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Talk Together · شەحن</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#6d4aff">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;800&family=Noto+Sans+Arabic:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f4f2fb;--card:#fff;--ink:#18142d;--muted:#6c6787;--line:#e6e2f3;--brand:#6d4aff;--brand2:#3b82f6;--gold:#f59e0b;--ok:#16a34a;--bad:#e11d48;--soft:#efeaff}
+@media (prefers-color-scheme:dark){:root{--bg:#0f0c1d;--card:#1a1630;--ink:#f3f0ff;--muted:#a49fbe;--line:#2c2648;--soft:#272046}}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans Arabic","Noto Sans",system-ui,sans-serif;line-height:1.6}
+html[dir="ltr"] body{font-family:"Noto Sans","Noto Sans Arabic",system-ui,sans-serif}
+.wrap{max-width:460px;margin:0 auto;padding-block:20px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.1rem}
+.brand .logo{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--brand),var(--brand2));display:grid;place-items:center;color:#fff;font-size:1.2rem}
+select{font:inherit;color:inherit;background:var(--card);border:1.5px solid var(--line);border-radius:999px;padding:6px 10px}
+.hero{margin:22px 0 14px;text-align:center}
+.hero .coin{font-size:3.2rem;line-height:1}
+.hero h1{margin:8px 0 4px;font-size:1.5rem}
+.hero p{margin:0;color:var(--muted)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:18px;box-shadow:0 10px 30px rgba(40,20,120,.08)}
+label{display:block;font-weight:700;font-size:.92rem;margin:14px 0 6px}
+label:first-child{margin-top:0}
+input{width:100%;font:inherit;color:inherit;background:var(--bg);border:1.5px solid var(--line);border-radius:14px;padding:13px 14px;outline:none;direction:ltr;text-align:left;letter-spacing:.04em}
+input:focus{border-color:var(--brand)}
+#code{text-transform:uppercase;font-weight:800;letter-spacing:.14em;font-size:1.05rem}
+.who{min-height:1.6em;margin-top:6px;font-size:.9rem;color:var(--muted)}
+.who.ok{color:var(--ok);font-weight:700}
+.who.bad{color:var(--bad)}
+.hint{font-size:.8rem;color:var(--muted);margin-top:6px}
+button.go{margin-top:18px;width:100%;border:0;border-radius:16px;padding:14px;font:inherit;font-weight:800;font-size:1.05rem;color:#fff;cursor:pointer;
+  background:linear-gradient(135deg,var(--brand),var(--brand2));box-shadow:0 10px 24px rgba(109,74,255,.35)}
+button.go:disabled{opacity:.55;cursor:default}
+.result{margin-top:16px;border-radius:18px;padding:18px;text-align:center;display:none}
+.result.show{display:block;animation:pop .35s ease-out}
+.result.ok{background:linear-gradient(135deg,rgba(22,163,74,.12),rgba(245,158,11,.14));border:1.5px solid rgba(22,163,74,.35)}
+.result.bad{background:rgba(225,29,72,.08);border:1.5px solid rgba(225,29,72,.3);color:var(--bad)}
+.result .big{font-size:2.4rem}
+.result b.amt{display:block;font-size:1.6rem;color:var(--gold)}
+@keyframes pop{from{transform:scale(.94);opacity:0}}
+.steps{margin-top:18px;color:var(--muted);font-size:.85rem}
+.steps ol{padding-inline-start:20px;margin:6px 0}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){.result.show{animation:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="brand"><span class="logo">🎙️</span>Talk Together</div>
+    <select id="lang" aria-label="Language">
+      <option value="ckb">کوردی</option><option value="ar">العربية</option><option value="en">English</option>
+    </select>
+  </div>
+
+  <div class="hero">
+    <div class="coin">🪙</div>
+    <h1 data-t="title"></h1>
+    <p data-t="sub"></p>
+  </div>
+
+  <form class="card" id="form" autocomplete="off">
+    <label for="uid" data-t="idLabel"></label>
+    <input id="uid" inputmode="text" spellcheck="false" placeholder="300a4f87-8930-458a-9711-9f1bd76c0efd">
+    <div class="who" id="who" aria-live="polite"></div>
+    <div class="hint" data-t="idHint"></div>
+
+    <label for="code" data-t="codeLabel"></label>
+    <input id="code" inputmode="text" spellcheck="false" maxlength="19" placeholder="XXXX-XXXX-XXXX-XXXX">
+
+    <button class="go" id="go" type="submit" data-t="go"></button>
+    <div class="result" id="result" role="status"></div>
+  </form>
+
+  <div class="steps">
+    <b data-t="howTitle"></b>
+    <ol><li data-t="how1"></li><li data-t="how2"></li><li data-t="how3"></li></ol>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.js"></script>
+<script>
+"use strict";
+// Only the public (publishable) key — never a secret key.
+const SUPABASE_URL = "https://vjuqtzhefxpiqsmasfkb.supabase.co";
+const SUPABASE_KEY = "sb_publishable_hs16UKvg16dApnabYQM9Cw_l2S-_XAU";
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, { auth: { persistSession: false } });
+
+const TXT = {
+  ckb: { title: "شەحنکردنی سکە", sub: "کۆدەکەت بنووسە، سکەکان ڕاستەوخۆ دەچنە هەژمارەکەت",
+    idLabel: "ID ـی هەژمارەکەت", idHint: "لە ئەپەکە: ⚙️ ڕێکخستنەکان ← 💰 جزدان ← 📋 کۆپیکردنی ID",
+    codeLabel: "کۆدی شەحن", go: "✅ شەحن بکە", checking: "پشکنین…", account: "هەژمار: {name}", noUser: "ئەم ID ـە نەدۆزرایەوە.", badId: "ID ـەکە ڕاست نییە.",
+    ok: "{n} سکە زیاد کرا بۆ {name}", balance: "باڵانسی ئێستا: {b} 🪙", invalid: "کۆدەکە هەڵەیە.", used: "ئەم کۆدە پێشتر بەکارهاتووە.",
+    tooMany: "زۆر هەوڵی هەڵە. ١٥ خولەکی تر هەوڵ بدەرەوە.", net: "ئینتەرنێت کێشەی هەیە. دووبارە هەوڵ بدەرەوە.", fill: "ID و کۆد بنووسە.",
+    howTitle: "چۆن؟", how1: "ID ـی هەژمارەکەت لە ناو ئەپەکە کۆپی بکە.", how2: "کۆدی شەحنەکەت لێرە بنووسە.", how3: "سکەکان ڕاستەوخۆ دەردەکەون لە جزدانەکەت." },
+  ar: { title: "شحن العملات", sub: "أدخل رمزك وستضاف العملات إلى حسابك فوراً",
+    idLabel: "معرّف حسابك (ID)", idHint: "في التطبيق: ⚙️ الإعدادات ← 💰 المحفظة ← 📋 نسخ المعرّف",
+    codeLabel: "رمز الشحن", go: "✅ اشحن", checking: "جارٍ التحقق…", account: "الحساب: {name}", noUser: "لم يُعثر على هذا المعرّف.", badId: "المعرّف غير صحيح.",
+    ok: "تمت إضافة {n} عملة إلى {name}", balance: "الرصيد الحالي: {b} 🪙", invalid: "الرمز غير صحيح.", used: "تم استخدام هذا الرمز من قبل.",
+    tooMany: "محاولات خاطئة كثيرة. حاول بعد ١٥ دقيقة.", net: "مشكلة في الاتصال. حاول مرة أخرى.", fill: "أدخل المعرّف والرمز.",
+    howTitle: "كيف؟", how1: "انسخ معرّف حسابك من داخل التطبيق.", how2: "أدخل رمز الشحن هنا.", how3: "تظهر العملات فوراً في محفظتك." },
+  en: { title: "Recharge coins", sub: "Enter your code and the coins go straight to your account",
+    idLabel: "Your account ID", idHint: "In the app: ⚙️ Settings → 💰 Wallet → 📋 Copy my ID",
+    codeLabel: "Recharge code", go: "✅ Recharge", checking: "Checking…", account: "Account: {name}", noUser: "No account with this ID.", badId: "This ID isn't valid.",
+    ok: "{n} coins added to {name}", balance: "New balance: {b} 🪙", invalid: "That code isn't valid.", used: "This code was already used.",
+    tooMany: "Too many wrong tries. Try again in 15 minutes.", net: "Connection problem. Please try again.", fill: "Enter the ID and the code.",
+    howTitle: "How?", how1: "Copy your account ID inside the app.", how2: "Type your recharge code here.", how3: "The coins appear in your wallet right away." },
+};
+let lang = "ckb";
+try { const s = localStorage.getItem("rc-lang"); if (TXT[s]) lang = s; } catch {}
+const $ = (s) => document.querySelector(s);
+const t = (k, v) => { let s = TXT[lang][k] || TXT.en[k] || k; if (v) for (const [a, b] of Object.entries(v)) s = s.replace(`{${a}}`, b); return s; };
+const fmt = (n) => Number(n || 0).toLocaleString("en");
+function applyLang() {
+  document.documentElement.lang = lang; document.documentElement.dir = lang === "en" ? "ltr" : "rtl";
+  document.querySelectorAll("[data-t]").forEach((el) => (el.textContent = t(el.dataset.t)));
+  $("#lang").value = lang;
+}
+$("#lang").addEventListener("change", (e) => { lang = e.target.value; try { localStorage.setItem("rc-lang", lang); } catch {} applyLang(); lookup(); });
+applyLang();
+
+// ?id=… in the link fills the ID box
+const qid = new URLSearchParams(location.search).get("id");
+if (qid) $("#uid").value = qid;
+
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+let lookTimer = 0, lastLooked = "";
+async function lookup() {
+  const id = $("#uid").value.trim();
+  const who = $("#who");
+  if (!id) { who.textContent = ""; who.className = "who"; return; }
+  if (!UUID.test(id)) { who.textContent = id.length >= 36 ? t("badId") : ""; who.className = "who bad"; return; }
+  if (id === lastLooked && who.classList.contains("ok")) return;
+  lastLooked = id; who.textContent = t("checking"); who.className = "who";
+  const { data, error } = await sb.rpc("lookup_account", { p_user: id });
+  if ($("#uid").value.trim() !== id) return;
+  const row = Array.isArray(data) ? data[0] : null;
+  if (error || !row) { who.textContent = t("noUser"); who.className = "who bad"; return; }
+  who.textContent = "✅ " + t("account", { name: row.name }); who.className = "who ok";
+}
+$("#uid").addEventListener("input", () => { clearTimeout(lookTimer); lookTimer = setTimeout(lookup, 350); });
+if (qid) lookup();
+
+// format the code as XXXX-XXXX-XXXX-XXXX while typing
+$("#code").addEventListener("input", (e) => {
+  const raw = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 16);
+  e.target.value = raw.replace(/(.{4})(?=.)/g, "$1-");
+});
+
+function showResult(ok, html) { const r = $("#result"); r.className = "result show " + (ok ? "ok" : "bad"); r.innerHTML = html; }
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+$("#form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const id = $("#uid").value.trim(), code = $("#code").value.trim();
+  if (!id || !code) return showResult(false, esc(t("fill")));
+  if (!UUID.test(id)) return showResult(false, esc(t("badId")));
+  const btn = $("#go"); btn.disabled = true; btn.textContent = t("checking");
+  try {
+    const { data, error } = await sb.rpc("redeem_code", { p_user: id, p_code: code });
+    if (error) throw error;
+    const r = Array.isArray(data) ? data[0] : null;
+    const st = r?.o_status;
+    if (st === "ok") {
+      showResult(true, `<div class="big">🎉</div><b class="amt">+${fmt(r.o_coins)} 🪙</b>${esc(t("ok", { n: fmt(r.o_coins), name: r.o_name }))}<div>${esc(t("balance", { b: fmt(r.o_balance) }))}</div>`);
+      $("#code").value = "";
+    } else {
+      const msg = { invalid: "invalid", used: "used", too_many: "tooMany", no_user: "noUser" }[st] || "invalid";
+      showResult(false, "⚠️ " + esc(t(msg)));
+    }
+  } catch (err) {
+    console.error(err); showResult(false, "⚠️ " + esc(t("net")));
+  } finally { btn.disabled = false; btn.textContent = t("go"); }
+});
+</script>
+</body>
+</html>
